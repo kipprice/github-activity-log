@@ -19,7 +19,7 @@ setup_config() {
 }
 
 setup_lookback() {
-    
+
 }
 
 setup_key() {
@@ -54,7 +54,7 @@ setup_team() {
 
 setup_docker() {
     docker build -t github-activity-log .
-    docker run --rm -p 8080:8080 github-acivity-log
+    docker run --rm github-acivity-log
 }
 
 main() {

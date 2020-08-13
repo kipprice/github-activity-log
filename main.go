@@ -2,8 +2,10 @@ package main
 
 import (
 	"strings"
-	"io/ioutil"
+	"strconv"
+	"os"
 	"github.com/kipprice/github-activity-log/githubHelpers"
+	"github.com/kipprice/github-activity-log/htmlHelpers"
 )
 
 func main() {
@@ -11,13 +13,17 @@ func main() {
 }
 
 func printPage() {
-	rawUsers, _ := ioutil.ReadFile("/config/.github_team")
-	lookback, _ := ioutil.ReadFile("/config/.")
-	users := strings.Split(string(rawUsers), "\n")
+	rawUsers := os.Getenv("GITHUB_TEAM")
 
-	githubHelpers.StartPageHtml()
+	users := strings.Split(string(rawUsers), ",")
+
+	lookbackDays, err := strconv.Atoi(os.Getenv("LOOKBACK_DAYS"))
+	if err != nil { lookbackDays = 7 }
+
+	// Start the rendering
+	htmlHelpers.StartPageHtml()
 	for _, user := range users {
-		githubHelpers.PrintActivityLogForUser(users, 14)
+		githubHelpers.PrintActivityLogForUser(user, lookbackDays)
 	}
-	githubHelpers.EndPageHtml()
+	htmlHelpers.EndPageHtml()
 }
