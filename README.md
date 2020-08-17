@@ -16,7 +16,7 @@ In order to run this app, you will need to get an Personal Access Token for Gith
    - admin:org -> read:org
    - user
 1. Copy the token somewhere safe
-1. Make sure to select "Enable SSO" to allow pass-through to SSO-protected repos
+1. Make sure to select "Enable SSO" and authorize with any relevant SSO orgs to include SSO-protected repos
 
 ### Setup: Generate Environment Variables
 
@@ -28,4 +28,5 @@ This application relies on some environment variables to be set, namely for the 
 ### Run It
 
 1. If you don't already have `go` installed, [install it](https://golang.org/doc/install).
+1. Run `go mod download` to install all of the dependencies
 1. Run `go run main.go > results/index.html` to generate a webpage at results/index.html with all of the results.
