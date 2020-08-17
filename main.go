@@ -17,12 +17,14 @@ func printPage() {
 
 	users := strings.Split(string(rawUsers), ",")
 
+
 	lookbackDays, err := strconv.Atoi(os.Getenv("LOOKBACK_DAYS"))
 	if err != nil { lookbackDays = 7 }
 
 	// Start the rendering
 	htmlHelpers.StartPageHtml()
 	for _, user := range users {
+		if len(user) == 0 { continue }
 		githubHelpers.PrintActivityLogForUser(user, lookbackDays)
 	}
 	htmlHelpers.EndPageHtml()

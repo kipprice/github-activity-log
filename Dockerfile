@@ -1,14 +1,16 @@
 # iron/go:dev is the alpine image with the go tools added
-FROM iron/go:dev
+FROM golang:1.12
 
+ENV GO111MODULE=on
 WORKDIR /app
 
-# Set an env var that matches your github repo name, replace treeder/dockergo here with your repo name
-ENV SRC_DIR=/go/src/github.com/kipprice/github-activity-log
+COPY go.mod . 
+COPY go.sum .
 
-# Add the source code:
-ADD . $SRC_DIR
+RUN go mod download
+COPY . . 
 
 # Build it:
-RUN cd $SRC_DIR; go build -o myapp; cp myapp /app/
-ENTRYPOINT ["./myapp"]
+RUN go build -o app
+
+ENTRYPOINT ["./app"]

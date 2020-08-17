@@ -16,6 +16,7 @@ func loadToken() {
 func createClient() *github.Client {
 	if GithubToken == "" { loadToken() }
 
+	
 	ctx := createContext();
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: GithubToken},

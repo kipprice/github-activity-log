@@ -6,7 +6,8 @@ import (
 
 func generatePRSearchString (username string, lookbackDays int, asCommenter bool) string {
 	
-	query := "archived:false is:PR user:codecademy-engineering user:Codecademy"
+	
+	query := "archived:false is:PR user:codecademy-engineering user:Codecademy base:master base:main base:next"
 
 	if (asCommenter) {
 		query += " commenter:" + username
