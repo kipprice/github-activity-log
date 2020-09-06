@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Github Activity Log</title>
+        <style>
+            a { 
+                text-decoration :none !important; 
+            } 
+
+            body {
+                font-family: 'Courier New';
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+            }
+            
+            body > * { 
+                width: 80vw; 
+            } 
+            
+            .label { 
+                font-size: 0.8rem; 
+                text-transform: lowercase; 
+            } 
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+
+        <script>
+            const rawUsernames = "{{ .usernames }}";
+            const root = document.getElementById('root');
+            root.innerHTML = "";
+
+            const loadAllUsers = async (usernames) => {
+                users = usernames.split(",");
+
+                const promises = [];
+                for (let u of users) {
+                    if (!u) { continue; }
+                    promises.push(loadUserData(u))
+                }
+                await Promise.all(promises)
+            }
+            
+            const loadUserData = async (username) => {
+                const loading = document.createElement("h2");
+                loading.innerHTML = `Loading ${username}...`;
+                document.body.appendChild(loading);
+
+                const response = await fetch(`./activity/${username}`);
+                const userData = await response.text();
+                document.getElementById('root').innerHTML += userData;
+
+                document.body.removeChild(loading)
+            }
+
+            loadAllUsers(rawUsernames);
+        </script>
+    </body>
+</html>

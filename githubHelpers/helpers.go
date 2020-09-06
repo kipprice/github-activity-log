@@ -1,23 +1,26 @@
 package githubHelpers
 
 import (
-	"os"
 	"context"
+	"os"
+
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
-var GithubToken string;
+var GithubToken string
 
+// loadToken grabs the github token from the environment
 func loadToken() {
 	GithubToken = os.Getenv("GITHUB_TOKEN")
 }
 
 func createClient() *github.Client {
-	if GithubToken == "" { loadToken() }
+	if GithubToken == "" {
+		loadToken()
+	}
 
-	
-	ctx := createContext();
+	ctx := createContext()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: GithubToken},
 	)
@@ -28,5 +31,5 @@ func createClient() *github.Client {
 }
 
 func createContext() context.Context {
-	return context.Background();
+	return context.Background()
 }
