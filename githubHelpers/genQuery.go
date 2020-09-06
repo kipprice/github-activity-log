@@ -27,8 +27,6 @@ func generatePRSearchString(username string, lookbackDays int, asCommenter bool)
 		query += " is:open"
 	}
 
-	fmt.Println("query: " + query)
-
 	return query
 }
 

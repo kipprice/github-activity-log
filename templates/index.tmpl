@@ -13,6 +13,10 @@
                 align-items: center;
                 flex-direction: column;
             }
+
+            h1, h2 {
+                margin-top: 3rem;
+            }
             
             body > * { 
                 width: 80vw; 
@@ -44,7 +48,7 @@
             }
             
             const loadUserData = async (username) => {
-                const loading = document.createElement("h2");
+                const loading = document.createElement("h1");
                 loading.innerHTML = `Loading ${username}...`;
                 document.body.appendChild(loading);
 

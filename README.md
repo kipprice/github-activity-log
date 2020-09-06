@@ -1,6 +1,6 @@
 # Github Activity Log
 
-Prints details about a Codecademy's users activity on Github (as of right now).
+Generates a live webpage about a set of users' activity on Github. It currently is pretty slow in loading, but can get a lot of information.
 
 ## Running the app
 
@@ -12,21 +12,17 @@ In order to run this app, you will need to get an Personal Access Token for Gith
 1. Click "Generate New Token"
 1. Select the following permissions:
    - repo
-   - read:packages
    - admin:org -> read:org
-   - user
+   - user -> read:user
 1. Copy the token somewhere safe
 1. Make sure to select "Enable SSO" and authorize with any relevant SSO orgs to include SSO-protected repos
 
-### Setup: Generate Environment Variables
+### Running the server
 
-This application relies on some environment variables to be set, namely for the users you're loading data for, the token you created earlier, and the number of days to lookback.
-
-1. Run `sh setup.sh` to generate `config/export_vars.sh` containing your specific environment variables.
-1. Run `source config/export_vars.sh` to set all appropriate environment vars in your terminal.
-
-### Run It
-
-1. If you don't already have `go` installed, [install it](https://golang.org/doc/install).
-1. Run `go mod download` to install all of the dependencies
-1. Run `go run main.go > results/index.html` to generate a webpage at results/index.html with all of the results.
+1. Run `sh setup.sh` to setup the application to run within a docker container. All environment variables will be saved to `config/.env`. Through this script, you will be prompted for the following variables:
+    - **GitHub Token**: the key to the token you generated above
+    - **GitHub Usernames**: a new-line delimited list of github usernames to search on
+    - **GitHub Organizations**: the GitHub organizations to look within; this can be user-specific or repo-specific. Leave blank for all.
+    - **GitHub Branches**: within the specified orgs, what branches should have PRs included. Leave blank for all.
+    - **Lookback Days**: the number of days this search should run on
+1. Run the docker container with `docker run`

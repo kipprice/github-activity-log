@@ -18,7 +18,7 @@ func PrintActivityLogForUser(username string, lookbackDays int) string {
 	userService := client.Users
 	user, _, _ := userService.Get(ctx, username)
 
-	out += html.Header(user.GetName(), 2)
+	out += html.Header(user.GetName(), 1)
 
 	var opts *github.SearchOptions
 
@@ -26,7 +26,7 @@ func PrintActivityLogForUser(username string, lookbackDays int) string {
 
 	// ==> get all PRs authored by this individual
 	open, _, _ := searchService.Issues(ctx, generatePRSearchString(username, 0, false), opts)
-	out += html.Header("As Author", 3)
+	out += html.Header("As Author", 2)
 	out += loopThroughPRs(open, client, "")
 
 	closed, _, _ := searchService.Issues(ctx, generatePRSearchString(username, lookbackDays, false), opts)
@@ -34,7 +34,7 @@ func PrintActivityLogForUser(username string, lookbackDays int) string {
 
 	// ==> get all PRs reviewed bu this individual
 	activeReview, _, _ := searchService.Issues(ctx, generatePRSearchString(username, 0, true), opts)
-	out += html.Header("As Reviewer", 3)
+	out += html.Header("As Reviewer", 2)
 	out += loopThroughPRs(activeReview, client, username)
 
 	reviewed, _, _ := searchService.Issues(ctx, generatePRSearchString(username, lookbackDays, true), opts)

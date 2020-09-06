@@ -1,59 +1,137 @@
-#! bin/bash
+#!/bin/bash
 
 # constants for what file gets generated
 declare -r FOLDER="config"
-declare -r FILENAME="export_vars.sh"
+declare -r FILENAME=".env"
 declare -r FILEPATH="$FOLDER/$FILENAME"
 
+# =========
+#  HELPERS
+# =========
+
 yn() {
-    echo "$1 (Y/N)\r"
-    read response
+    echo "$1" >$(tty)
+    printf "[Y/N] > " >$(tty)
+    read -r response
+    echo "" >$(tty)
     if [[ "$response" = "Y" ]]; then return 1; fi
     if [[ "$response" = "y" ]]; then return 1; fi
     return 0
 }
 
-setup_key() {
-    echo "\n==> Setting up GitHub Key"
-    if [ -f "$FOLDER/.github_key" ]; then
-        yn "Do you want to replace the current key?"
-        if [[ $? -eq 0 ]]; then return; fi
+collect_array() {
+    local out=""
+
+    read ipt
+
+    while [[ ! -z "$ipt" ]]; do
+        if [[ -z "$out" ]]; then
+            out="$ipt"
+        else
+            out="$out,$ipt"
+        fi
+        read ipt
+    done
+
+    echo $out
+}
+
+prompt_for_change() {
+    label=$1
+    val=$2
+
+    if [[ ! -z "$val" ]]; then
+        yn "$label: $val\nDo you want to change this?"
+        if [[ $? -eq 0 ]]; then
+            echo $val
+        fi
     fi
 
-    echo "Enter your GitHub API key: "
-    read key
-    
-    if [ -z "$key" ]; then return; fi
-    echo "export GITHUB_TOKEN=\"$key\"" >> $FILEPATH
+    echo ""
+}
+
+# =======
+#  SETUP
+# =======
+
+setup_key() {
+    echo "\n==> Setting up GitHub Key"
+
+    local key="$(prompt_for_change "GitHub Key" $GITHUB_TOKEN)"
+    if [[ -z "$key" ]]; then
+        echo "Enter the key for your GitHub personal access token: "
+        read key
+    fi
+
+    echo "GITHUB_TOKEN=$key" >> $FILEPATH
 }
 
 setup_team() {
     echo "\n==> Setting up GitHub Team"
 
-    local usernames=""
+    local usernames="$(prompt_for_change "GitHub Users" $GITHUB_TEAM)"
+    if [[ -z "$usernames" ]]; then
 
-    echo "What github IDs do you want to include? (Enter a blank line to end)"
-    read username
+        echo "What GitHub usernames do you want to include? (Enter a blank line to end)"
+        usernames=$(collect_array)
+    fi
 
-    while [[ ! -z "$username" ]]; do
-        usernames="$usernames,$username"
-        read username
-    done
+    echo "GITHUB_TEAM=$usernames" >> $FILEPATH
+}
 
-    echo "export GITHUB_TEAM=\"$usernames\"" >> $FILEPATH
+setup_orgs() {
+    echo "\n==> Setting up organizations & repos"
+    local orgs="$(prompt_for_change "GitHub Orgs & Repos" $GITHUB_ORGS)"
+    if [[ -z "$orgs" ]]; then
+        echo "What GitHub organizations & repos do you want to include? (Enter a blank line to end)"
+        orgs=$(collect_array)
+    fi
+
+    echo "GITHUB_ORGS=$orgs" >> $FILEPATH
+}
+
+setup_branches() {
+    echo "\n==> Setting up branches"
+    local branches="$(prompt_for_change "GitHub Branches" $GITHUB_BRANCHES)"
+
+    if [[ -z "$branches" ]]; then
+        echo "What GitHub branches do you want to include? (Enter a blank line to end)"
+        branches=$(collect_array)
+    fi
+
+    echo "GITHUB_BRANCHES=$branches" >> $FILEPATH
 }
 
 setup_lookback() {
-    echo "How many days do you want to lookback? \r"
-    read lookback_days
+    echo "\n==> Setting up lookback"
+    local lookback_days="$(prompt_for_change "Lookback Days" $LOOKBACK_DAYS)"
 
-    echo "export LOOKBACK_DAYS=$lookback_days" >> $FILEPATH
+    if [[ -z "$lookback_days" ]]; then
+        echo "How many days do you want to look back for data? \r"
+        read lookback_days
+    fi
+
+    echo "LOOKBACK_DAYS=$lookback_days" >> $FILEPATH
+}
+
+setup_port() {
+    echo "\n==> Setting up port"
+    local port="$(prompt_for_change "Port" $PORT)"
+
+    if [[ -z "$port" ]]; then
+        echo "What port would you like to host the application on?"
+        read port
+    fi
+
+    echo "PORT=$port" >> $FILEPATH
+}
+
+setup_mode() {
+    echo "GIN_MODE=release" >> $FILEPATH
 }
 
 setup_docker() {
-    # TODO: finish this all up
-    docker build -t github-activity-log .
-    docker run --rm github-acivity-log
+    docker build . -t github-activity-log
 }
 
 setup_config() {
@@ -63,12 +141,19 @@ setup_config() {
         yn "You already have the appropriate setup; do you want to update?"
         if [[ $? -eq 0 ]]; then return; fi
 
-        # clear out the existing file
+        # get the token out of the file
+        source $FILEPATH
         rm $FILEPATH
+
+        yn "Would you like to rerun the Docker build? (Only required if there are code changes)"
+        if [[ $? -eq 1 ]]; then
+            setup_docker
+        fi
         
     else
         # make the appropriate folder
         mkdir $FOLDER
+        setup_docker
     fi
 
     # generate the config file
@@ -77,28 +162,16 @@ setup_config() {
     # perform the additional setup
     setup_key
     setup_team
+    setup_orgs
+    setup_branches
     setup_lookback
-}
-
-run_config() {
-    set -o allexport
-    source $FILEPATH
-    set +o allexport
-}
-
-run_app() {
-    go run main.go > results/test.html
+    setup_port
+    setup_mode
 }
 
 main() {
     clear
-
-    # set up the appropriate config
     setup_config
-    # run_config
-    # run_app
-
-    # finalization
     clear
     echo "==> Configured!"
 }
