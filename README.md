@@ -14,7 +14,7 @@ In order to run this app, you will need to get an Personal Access Token for Gith
    - repo
    - admin:org -> read:org
    - user -> read:user
-1. Copy the token somewhere safe
+1. Copy the token key somewhere safe
 1. Make sure to select "Enable SSO" and authorize with any relevant SSO orgs to include SSO-protected repos
 
 ### Running the server
@@ -25,4 +25,6 @@ In order to run this app, you will need to get an Personal Access Token for Gith
     - **GitHub Organizations**: the GitHub organizations to look within; this can be user-specific or repo-specific. Leave blank for all.
     - **GitHub Branches**: within the specified orgs, what branches should have PRs included. Leave blank for all.
     - **Lookback Days**: the number of days this search should run on
-1. Run the docker container with `docker run`
+    - **Port**: the port to run the app on; defaults to 8080
+1. Run the docker container via `sh run.sh`
+1. Go to [http://localhost:8080](http://localhost:8080) (or to whatever port you configured) to see the GitHub activity data

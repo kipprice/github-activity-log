@@ -50,6 +50,10 @@ prompt_for_change() {
     echo ""
 }
 
+line_count() {
+    echo $(wc -l < $FILEPATH | awk '{print $1}')
+}
+
 # =======
 #  SETUP
 # =======
@@ -116,6 +120,12 @@ setup_lookback() {
 
 setup_port() {
     echo "\n==> Setting up port"
+
+    # Set a default value
+    if [[ -z $PORT ]]; then
+        PORT=8080
+    fi
+
     local port="$(prompt_for_change "Port" $PORT)"
 
     if [[ -z "$port" ]]; then
@@ -138,16 +148,21 @@ setup_config() {
 
     # check if the folder already exists
     if [ -d "$FOLDER" ]; then
-        yn "You already have the appropriate setup; do you want to update?"
-        if [[ $? -eq 0 ]]; then return; fi
-
-        # get the token out of the file
-        source $FILEPATH
-        rm $FILEPATH
-
         yn "Would you like to rerun the Docker build? (Only required if there are code changes)"
         if [[ $? -eq 1 ]]; then
             setup_docker
+        fi
+
+        lc=$(line_count)
+        if [[ lc -gt 6 ]]; then
+            yn "You already have the appropriate setup; do you want to update?"
+            if [[ $? -eq 0 ]]; then return; fi
+
+            # get the token out of the file
+            source $FILEPATH
+            rm $FILEPATH
+
+            
         fi
         
     else
