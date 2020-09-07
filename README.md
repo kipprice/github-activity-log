@@ -4,7 +4,7 @@ Generates a live webpage about a set of users' activity on Github. It currently 
 
 ## Running the app
 
-### Setup: Getting a Personal Access Token
+### Get a Personal Access Token
 
 In order to run this app, you will need to get an Personal Access Token for Github. The easiest way to do so is:
 
@@ -17,14 +17,19 @@ In order to run this app, you will need to get an Personal Access Token for Gith
 1. Copy the token key somewhere safe
 1. Make sure to select "Enable SSO" and authorize with any relevant SSO orgs to include SSO-protected repos
 
-### Running the server
+### Configure Docker and Environment Variables
+Run `sh setup.sh` to setup the application to run within a docker container. All environment variables will be saved to `config/.env`. Through this script, you will be prompted for the following variables:
 
-1. Run `sh setup.sh` to setup the application to run within a docker container. All environment variables will be saved to `config/.env`. Through this script, you will be prompted for the following variables:
-    - **GitHub Token**: the key to the token you generated above
-    - **GitHub Usernames**: a new-line delimited list of github usernames to search on
-    - **GitHub Organizations**: the GitHub organizations to look within. Leave blank for all.
-    - **GitHub Branches**: within the specified orgs, what branches should have PRs included. Leave blank for all.
-    - **Lookback Days**: the number of days this search should run on
-    - **Port**: the port to run the app on; defaults to 8080
+- **GitHub Token**: the key to the token you generated [above](#Get-a-Personal-Access-Token)
+- **GitHub Usernames**: a new-line delimited list of github usernames to search on
+- **GitHub Organizations**: the GitHub organizations to look within. Leave blank for all.
+- **GitHub Branches**: within the specified orgs, what branches should have PRs included. Leave blank for all.
+- **Lookback Days**: the number of days this search should run on
+- **Port**: the port to run the app on; defaults to 8080
+    
+This only needs to be run the first time you run the app, but you can run it again at any time to change your configuration.
+
+### Run the server
+1. If you haven't run the [setup script](#Configure-Docker-and-Environment-Variables), do so 
 1. Run the docker container via `sh run.sh`
 1. Go to [http://localhost:8080](http://localhost:8080) (or to whatever port you configured) to see the GitHub activity data
